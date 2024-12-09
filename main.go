@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image"
 	"log"
 	"os"
 
@@ -21,7 +22,7 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	drawOptions := ebiten.DrawImageOptions{}
 	drawOptions.GeoM.Translate(50.0, float64(g.testValue))
-	screen.DrawImage(g.texture, &drawOptions)
+	screen.DrawImage(g.texture.SubImage(image.Rect(0, 0, 30, 0)).(*ebiten.Image), &drawOptions)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -45,7 +46,7 @@ func main() {
 	}
 
 	game := &Game{
-		testImg: img,
+		texture: img,
 	}
 
 	if err := ebiten.RunGame(game); err != nil {
