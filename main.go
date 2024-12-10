@@ -26,6 +26,7 @@ type Piece struct {
 type CollisionBlock struct {
 	colourIndex int
 	position    [2]int
+	permanent   bool
 }
 
 // Atlas texture
@@ -41,7 +42,7 @@ func GenerateRandomPiece() Piece {
 	return Piece{
 		rand.IntN(7),
 		0,
-		[2]int{0, 0},
+		[2]int{-2, -10},
 	}
 }
 
@@ -60,7 +61,7 @@ func (p *Piece) CanMove(dir [2]int) bool {
 }
 
 func (p *Piece) CanRotate(rotIndex int) bool {
-  var positions [][2]int
+	var positions [][2]int
 	for _, block := range collision {
 		positions = append(positions, block.position)
 	}
@@ -90,24 +91,40 @@ func (g *Game) Update() error {
 			if !currentPiece.CanMove([2]int{0, 1}) {
 				for _, pos := range PIECES[currentPiece.colourIndex][currentPiece.rotationIndex] {
 					blockPos := AddVec2(pos, currentPiece.position)
-					collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos})
+					collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos, false})
 				}
 				currentPiece = GenerateRandomPiece()
 			}
 		}
 	}
-  if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-    newRotIndex := (currentPiece.rotationIndex + 3) % 4
-    if currentPiece.CanRotate(newRotIndex) {
-      currentPiece.rotationIndex = newRotIndex
-    }
-  }
-  if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-    newRotIndex := (currentPiece.rotationIndex + 1) % 4
-    if currentPiece.CanRotate(newRotIndex) {
-      currentPiece.rotationIndex = newRotIndex
-    }
-  }
+	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
+		//  while currentPiece.CanMove([2]int{0, 1}) {
+		// currentPiece.position[1] += 1
+		//  }
+		for {
+			if !currentPiece.CanMove([2]int{0, 1}) {
+				break
+			}
+			currentPiece.position[1] += 1
+		}
+		for _, pos := range PIECES[currentPiece.colourIndex][currentPiece.rotationIndex] {
+			blockPos := AddVec2(pos, currentPiece.position)
+			collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos, false})
+		}
+		currentPiece = GenerateRandomPiece()
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+		newRotIndex := (currentPiece.rotationIndex + 3) % 4
+		if currentPiece.CanRotate(newRotIndex) {
+			currentPiece.rotationIndex = newRotIndex
+		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+		newRotIndex := (currentPiece.rotationIndex + 1) % 4
+		if currentPiece.CanRotate(newRotIndex) {
+			currentPiece.rotationIndex = newRotIndex
+		}
+	}
 	return nil
 }
 
@@ -138,11 +155,11 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 func gameInit() {
 	for i := -HALF_WIDTH - 1; i < HALF_WIDTH+1; i++ {
-		collision = append(collision, CollisionBlock{7, [2]int{i, HALF_HEIGHT}})
+		collision = append(collision, CollisionBlock{7, [2]int{i, HALF_HEIGHT}, true})
 	}
 	for i := -HALF_HEIGHT; i < HALF_HEIGHT; i++ {
-		collision = append(collision, CollisionBlock{7, [2]int{HALF_WIDTH, i}})
-		collision = append(collision, CollisionBlock{7, [2]int{-HALF_WIDTH - 1, i}})
+		collision = append(collision, CollisionBlock{7, [2]int{HALF_WIDTH, i}, true})
+		collision = append(collision, CollisionBlock{7, [2]int{-HALF_WIDTH - 1, i}, true})
 
 	}
 }
