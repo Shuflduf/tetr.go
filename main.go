@@ -76,19 +76,22 @@ func CheckBoard() {
 }
 
 func ClearLines(lines []int) {
-  var newCollision []CollisionBlock = collision
-  var removed int = 0
-	for i, block := range collision {
-		if block.permanent {
-			continue
+	slices.Sort(lines)
+
+	for _, line := range lines {
+		for i := 0; i < len(collision); {
+			if collision[i].position[1] == line && !collision[i].permanent {
+				collision = remove(collision, i)
+			} else {
+				i++
+			}
 		}
-    if !slices.Contains(lines, block.position[1]) {
-      continue
-    }
-    remove(newCollision, i - removed)
-    removed++
+		for i := range collision {
+			if collision[i].position[1] < line {
+				collision[i].position[1]++
+			}
+		}
 	}
-  collision = newCollision
 }
 
 func (g *Game) Update() error {
