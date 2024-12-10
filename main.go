@@ -9,9 +9,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
+var testValue int
+var texture *ebiten.Image
+
 type Game struct {
-	texture   *ebiten.Image
-	testValue int
 }
 
 func (g *Game) Update() error {
@@ -21,10 +22,10 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	drawOptions := ebiten.DrawImageOptions{}
-	drawOptions.GeoM.Translate(50.0, float64(g.testValue))
-  pieceIndex := 1
-	rect := image.Rect(32 * pieceIndex, 0, 32 * (pieceIndex + 1), 32)
-	screen.DrawImage(g.texture.SubImage(rect).(*ebiten.Image), &drawOptions)
+	drawOptions.GeoM.Translate(50.0, float64(testValue))
+	pieceIndex := 1
+	rect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
+	screen.DrawImage(texture.SubImage(rect).(*ebiten.Image), &drawOptions)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -47,9 +48,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	game := &Game{
-		texture: img,
-	}
+	texture = img
+	game := &Game{}
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
