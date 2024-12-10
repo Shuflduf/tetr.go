@@ -15,26 +15,28 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-	g.testValue += 1
+	// g.testValue += 1
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	drawOptions := ebiten.DrawImageOptions{}
 	drawOptions.GeoM.Translate(50.0, float64(g.testValue))
-	screen.DrawImage(g.texture.SubImage(image.Rect(0, 0, 30, 0)).(*ebiten.Image), &drawOptions)
+  pieceIndex := 1
+	rect := image.Rect(32 * pieceIndex, 0, 32 * (pieceIndex + 1), 32)
+	screen.DrawImage(g.texture.SubImage(rect).(*ebiten.Image), &drawOptions)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 320, 240
+	return 896, 672
 }
 
 func main() {
-	ebiten.SetWindowSize(640, 480)
+	ebiten.SetWindowSize(1152, 864)
 	ebiten.SetWindowTitle("Hello, World!")
 
 	// Load the image from a file
-	f, err := os.Open("Tetr-Skin.png")
+	f, err := os.Open("texture.png")
 	if err != nil {
 		log.Fatal(err)
 	}
