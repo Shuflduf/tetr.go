@@ -3,6 +3,7 @@ package main
 import (
 	"image"
 	"log"
+	"math/rand/v2"
 	"os"
 	"slices"
 
@@ -36,6 +37,18 @@ var currentPiece Piece = Piece{
 	[2]int{0, 0},
 }
 
+func AddVec2(first, second [2]int) [2]int {
+	return [2]int{first[0] + second[0], first[1] + second[1]}
+}
+
+func GenerateRandomPiece() Piece {
+	return Piece {
+		0,
+		0,
+		[2]int{0, 0},
+	}
+}
+
 func (p *Piece) CanMove(dir [2]int) bool {
 	var positions [][2]int
 	for _, block := range collision {
@@ -62,7 +75,20 @@ func (g *Game) Update() error {
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		currentPiece.position[1] += 1
+		if currentPiece.CanMove([2]int{0, 1}) {
+			currentPiece.position[1] += 1
+			if !currentPiece.CanMove([2]int{0, 1}) {
+				for _, pos := range PIECES[currentPiece.colourIndex][currentPiece.rotationIndex] {
+					blockPos := AddVec2(pos, currentPiece.position)
+					collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos})
+				}
+				currentPiece = Piece{
+					1,
+					0,
+					[2]int{0, 0},
+				}
+			}
+		}
 	}
 	return nil
 }
@@ -107,6 +133,9 @@ func main() {
 	ebiten.SetWindowSize(1152, 864)
 	ebiten.SetWindowTitle("Hello, World!")
 	ebiten.SetFullscreen(true)
+
+	// rand.Seed(time.Now().UnixNano())
+	log.Println(rand.Uint32N(6))
 
 	// Load the image from a file
 	f, err := os.Open("assets/texture_simple.png")
