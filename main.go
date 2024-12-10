@@ -7,6 +7,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 const BOARD_WIDTH = 10
@@ -35,6 +36,9 @@ var currentPiece Piece = Piece{
 }
 
 func (g *Game) Update() error {
+	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+		currentPiece.position[0] -= 1
+	}
 	return nil
 }
 
@@ -44,6 +48,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		drawOptions := ebiten.DrawImageOptions{}
 		drawOptions.GeoM.Translate(float64(block.position[0]+offsetGrid[0])*32, float64(block.position[1]+offsetGrid[1])*32)
 		pieceIndex := block.colourIndex
+		cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
+		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
+	}
+	for _, pos := range PIECES[currentPiece.colourIndex][currentPiece.rotationIndex] {
+		drawOptions := ebiten.DrawImageOptions{}
+		drawOptions.GeoM.Translate(float64(pos[0]+offsetGrid[0])*32, float64(pos[1]+offsetGrid[1])*32)
+		pieceIndex := currentPiece.colourIndex
 		cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
 		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
 	}
@@ -70,7 +81,7 @@ func main() {
 	ebiten.SetFullscreen(true)
 
 	// Load the image from a file
-	f, err := os.Open("texture.png")
+	f, err := os.Open("texture_simple.png")
 	if err != nil {
 		log.Fatal(err)
 	}
