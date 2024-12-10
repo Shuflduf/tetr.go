@@ -4,6 +4,7 @@ import (
 	"image"
 	"log"
 	"os"
+	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -35,9 +36,33 @@ var currentPiece Piece = Piece{
 	[2]int{0, 0},
 }
 
+func (p *Piece) CanMove(dir [2]int) bool {
+	var positions [][2]int
+	for _, block := range collision {
+		positions = append(positions, block.position)
+	}
+	for _, block_offset := range PIECES[p.colourIndex][p.rotationIndex] {
+		block_position := [2]int{block_offset[0] + p.position[0] + dir[0], block_offset[1] + p.position[1] + dir[1]}
+		if slices.Contains(positions, block_position) {
+			return false
+		}
+	}
+	return true
+}
+
 func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		currentPiece.position[0] -= 1
+		if currentPiece.CanMove([2]int{-1, 0}) {
+			currentPiece.position[0] -= 1
+		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+		if currentPiece.CanMove([2]int{1, 0}) {
+			currentPiece.position[0] += 1
+		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+		currentPiece.position[1] += 1
 	}
 	return nil
 }
@@ -53,7 +78,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 	for _, pos := range PIECES[currentPiece.colourIndex][currentPiece.rotationIndex] {
 		drawOptions := ebiten.DrawImageOptions{}
-		drawOptions.GeoM.Translate(float64(pos[0]+offsetGrid[0])*32, float64(pos[1]+offsetGrid[1])*32)
+		drawOptions.GeoM.Translate(
+			float64(pos[0]+offsetGrid[0]+currentPiece.position[0])*32,
+			float64(pos[1]+offsetGrid[1]+currentPiece.position[1])*32,
+		)
 		pieceIndex := currentPiece.colourIndex
 		cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
 		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
@@ -81,7 +109,7 @@ func main() {
 	ebiten.SetFullscreen(true)
 
 	// Load the image from a file
-	f, err := os.Open("texture_simple.png")
+	f, err := os.Open("assets/texture_simple.png")
 	if err != nil {
 		log.Fatal(err)
 	}
