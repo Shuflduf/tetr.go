@@ -9,7 +9,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 const BOARD_WIDTH = 10
@@ -38,6 +37,12 @@ func AddVec2(first, second [2]int) [2]int {
 	return [2]int{first[0] + second[0], first[1] + second[1]}
 }
 
+// Taken from stack overflow
+func remove(s []CollisionBlock, i int) []CollisionBlock {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
 func GenerateRandomPiece() Piece {
 	return Piece{
 		rand.IntN(7),
@@ -46,85 +51,48 @@ func GenerateRandomPiece() Piece {
 	}
 }
 
-func (p *Piece) CanMove(dir [2]int) bool {
+func CheckBoard() {
 	var positions [][2]int
 	for _, block := range collision {
-		positions = append(positions, block.position)
-	}
-	for _, block_offset := range PIECES[p.colourIndex][p.rotationIndex] {
-		block_position := [2]int{block_offset[0] + p.position[0] + dir[0], block_offset[1] + p.position[1] + dir[1]}
-		if slices.Contains(positions, block_position) {
-			return false
+		if !block.permanent {
+			positions = append(positions, block.position)
 		}
 	}
-	return true
+	var foundRows []int
+	for y := HALF_HEIGHT; y > -HALF_HEIGHT; y-- {
+		found := true
+		for x := -HALF_WIDTH; x < HALF_WIDTH; x++ {
+			testPos := [2]int{x, y}
+			if !slices.Contains(positions, testPos) {
+				found = false
+				break
+			}
+		}
+		if found {
+			foundRows = append(foundRows, y)
+		}
+	}
+	ClearLines(foundRows)
 }
 
-func (p *Piece) CanRotate(rotIndex int) bool {
-	var positions [][2]int
-	for _, block := range collision {
-		positions = append(positions, block.position)
-	}
-	for _, block_offset := range PIECES[p.colourIndex][rotIndex] {
-		block_position := [2]int{block_offset[0] + p.position[0], block_offset[1] + p.position[1]}
-		if slices.Contains(positions, block_position) {
-			return false
+func ClearLines(lines []int) {
+  var newCollision []CollisionBlock = collision
+  var removed int = 0
+	for i, block := range collision {
+		if block.permanent {
+			continue
 		}
+    if !slices.Contains(lines, block.position[1]) {
+      continue
+    }
+    remove(newCollision, i - removed)
+    removed++
 	}
-	return true
+  collision = newCollision
 }
 
 func (g *Game) Update() error {
-	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
-		if currentPiece.CanMove([2]int{-1, 0}) {
-			currentPiece.position[0] -= 1
-		}
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
-		if currentPiece.CanMove([2]int{1, 0}) {
-			currentPiece.position[0] += 1
-		}
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
-		if currentPiece.CanMove([2]int{0, 1}) {
-			currentPiece.position[1] += 1
-			if !currentPiece.CanMove([2]int{0, 1}) {
-				for _, pos := range PIECES[currentPiece.colourIndex][currentPiece.rotationIndex] {
-					blockPos := AddVec2(pos, currentPiece.position)
-					collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos, false})
-				}
-				currentPiece = GenerateRandomPiece()
-			}
-		}
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		//  while currentPiece.CanMove([2]int{0, 1}) {
-		// currentPiece.position[1] += 1
-		//  }
-		for {
-			if !currentPiece.CanMove([2]int{0, 1}) {
-				break
-			}
-			currentPiece.position[1] += 1
-		}
-		for _, pos := range PIECES[currentPiece.colourIndex][currentPiece.rotationIndex] {
-			blockPos := AddVec2(pos, currentPiece.position)
-			collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos, false})
-		}
-		currentPiece = GenerateRandomPiece()
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		newRotIndex := (currentPiece.rotationIndex + 3) % 4
-		if currentPiece.CanRotate(newRotIndex) {
-			currentPiece.rotationIndex = newRotIndex
-		}
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-		newRotIndex := (currentPiece.rotationIndex + 1) % 4
-		if currentPiece.CanRotate(newRotIndex) {
-			currentPiece.rotationIndex = newRotIndex
-		}
-	}
+	PieceUpdate()
 	return nil
 }
 
