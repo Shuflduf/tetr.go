@@ -35,19 +35,14 @@ var currentPiece Piece = Piece{
 }
 
 func (g *Game) Update() error {
-	// g.testValue += 1
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	// drawOptions := ebiten.DrawImageOptions{}
-	// pieceIndex := 1
-	// cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
-	// screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
+	offsetGrid := [2]int{14, 10}
 	for _, block := range collision {
-    offsetGrid := [2]int {14, 10}
 		drawOptions := ebiten.DrawImageOptions{}
-		drawOptions.GeoM.Translate(float64(block.position[0] + offsetGrid[0])*32, float64(block.position[1] + offsetGrid[1])*32)
+		drawOptions.GeoM.Translate(float64(block.position[0]+offsetGrid[0])*32, float64(block.position[1]+offsetGrid[1])*32)
 		pieceIndex := block.colourIndex
 		cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
 		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
@@ -59,20 +54,20 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func gameInit() {
-	for i := -HALF_WIDTH - 1; i < HALF_WIDTH + 1; i++ {
+	for i := -HALF_WIDTH - 1; i < HALF_WIDTH+1; i++ {
 		collision = append(collision, CollisionBlock{7, [2]int{i, HALF_HEIGHT}})
 	}
-  for i := -HALF_HEIGHT; i < HALF_HEIGHT; i++ {
+	for i := -HALF_HEIGHT; i < HALF_HEIGHT; i++ {
 		collision = append(collision, CollisionBlock{7, [2]int{HALF_WIDTH, i}})
 		collision = append(collision, CollisionBlock{7, [2]int{-HALF_WIDTH - 1, i}})
 
-  }
+	}
 }
 
 func main() {
 	ebiten.SetWindowSize(1152, 864)
 	ebiten.SetWindowTitle("Hello, World!")
-  ebiten.SetFullscreen(true)
+	ebiten.SetFullscreen(true)
 
 	// Load the image from a file
 	f, err := os.Open("texture.png")
