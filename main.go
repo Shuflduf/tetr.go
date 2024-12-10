@@ -87,7 +87,7 @@ func ClearLines(lines []int) {
 			}
 		}
 		for i := range collision {
-			if collision[i].position[1] < line {
+			if collision[i].position[1] < line && !collision[i].permanent {
 				collision[i].position[1]++
 			}
 		}
