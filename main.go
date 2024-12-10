@@ -31,19 +31,15 @@ type CollisionBlock struct {
 // Atlas texture
 var texture *ebiten.Image
 var collision []CollisionBlock
-var currentPiece Piece = Piece{
-	0,
-	0,
-	[2]int{0, 0},
-}
+var currentPiece Piece = GenerateRandomPiece()
 
 func AddVec2(first, second [2]int) [2]int {
 	return [2]int{first[0] + second[0], first[1] + second[1]}
 }
 
 func GenerateRandomPiece() Piece {
-	return Piece {
-		0,
+	return Piece{
+		rand.IntN(7),
 		0,
 		[2]int{0, 0},
 	}
@@ -63,18 +59,32 @@ func (p *Piece) CanMove(dir [2]int) bool {
 	return true
 }
 
+func (p *Piece) CanRotate(rotIndex int) bool {
+  var positions [][2]int
+	for _, block := range collision {
+		positions = append(positions, block.position)
+	}
+	for _, block_offset := range PIECES[p.colourIndex][rotIndex] {
+		block_position := [2]int{block_offset[0] + p.position[0], block_offset[1] + p.position[1]}
+		if slices.Contains(positions, block_position) {
+			return false
+		}
+	}
+	return true
+}
+
 func (g *Game) Update() error {
-	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
 		if currentPiece.CanMove([2]int{-1, 0}) {
 			currentPiece.position[0] -= 1
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		if currentPiece.CanMove([2]int{1, 0}) {
 			currentPiece.position[0] += 1
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
 		if currentPiece.CanMove([2]int{0, 1}) {
 			currentPiece.position[1] += 1
 			if !currentPiece.CanMove([2]int{0, 1}) {
@@ -82,14 +92,22 @@ func (g *Game) Update() error {
 					blockPos := AddVec2(pos, currentPiece.position)
 					collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos})
 				}
-				currentPiece = Piece{
-					1,
-					0,
-					[2]int{0, 0},
-				}
+				currentPiece = GenerateRandomPiece()
 			}
 		}
 	}
+  if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+    newRotIndex := (currentPiece.rotationIndex + 3) % 4
+    if currentPiece.CanRotate(newRotIndex) {
+      currentPiece.rotationIndex = newRotIndex
+    }
+  }
+  if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+    newRotIndex := (currentPiece.rotationIndex + 1) % 4
+    if currentPiece.CanRotate(newRotIndex) {
+      currentPiece.rotationIndex = newRotIndex
+    }
+  }
 	return nil
 }
 
@@ -133,9 +151,6 @@ func main() {
 	ebiten.SetWindowSize(1152, 864)
 	ebiten.SetWindowTitle("Hello, World!")
 	ebiten.SetFullscreen(true)
-
-	// rand.Seed(time.Now().UnixNano())
-	log.Println(rand.Uint32N(6))
 
 	// Load the image from a file
 	f, err := os.Open("assets/texture_simple.png")
