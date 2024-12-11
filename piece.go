@@ -7,8 +7,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-var movingDir [2]bool = [2]bool{false, false}
-var dirTimers [2]int = [2]int{0, 0}
+var movingDir = [2]bool{false, false}
+var dirTimers = [2]int{0, 0}
+var ghostPieceHeight = -1
 
 // How many frames between each auto shift
 var arr int = 2
@@ -101,6 +102,7 @@ func PieceUpdate() {
 				CheckBoard()
 				currentPiece = nextPiece
 				nextPiece = GetNextPiece()
+        UpdateGhost()
 			}
 		}
 	}
@@ -118,17 +120,20 @@ func PieceUpdate() {
 		CheckBoard()
 		currentPiece = nextPiece
 		nextPiece = GetNextPiece()
+    UpdateGhost()
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
 		newRotIndex := (currentPiece.rotationIndex + 3) % 4
 		if currentPiece.CanRotate(newRotIndex) {
 			currentPiece.rotationIndex = newRotIndex
+      UpdateGhost()
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
 		newRotIndex := (currentPiece.rotationIndex + 1) % 4
 		if currentPiece.CanRotate(newRotIndex) {
 			currentPiece.rotationIndex = newRotIndex
+      UpdateGhost()
 		}
 	}
 }
@@ -137,6 +142,17 @@ func MovePiece(dir [2]int) {
 	if currentPiece.CanMove(dir) {
 		currentPiece.position[0] += dir[0]
 		currentPiece.position[1] += dir[1]
-	}
+    UpdateGhost()
+  }
+}
 
+func UpdateGhost() {
+  ghostPieceHeight = -1
+  for {
+    if currentPiece.CanMove([2]int{0, ghostPieceHeight + 1}) {
+      ghostPieceHeight++
+    } else {
+      break
+    }
+  }
 }
