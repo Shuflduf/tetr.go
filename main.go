@@ -10,6 +10,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 //go:embed assets/texture_simple.png
@@ -93,6 +94,9 @@ func ClearLines(lines []int) {
 
 func (g *Game) Update() error {
 	PieceUpdate()
+  if inpututil.IsKeyJustPressed(ebiten.KeyF) {
+    ebiten.SetFullscreen(!ebiten.IsFullscreen())
+  }
 	return nil
 }
 
