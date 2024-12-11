@@ -41,7 +41,6 @@ jobs:
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git fetch origin web
         git checkout web
-        git stash pop || true
         git add game.wasm wasm_exec.js
         git commit -m 'Deploy WASM build'
         git push origin web --force
