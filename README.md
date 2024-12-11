@@ -5,6 +5,8 @@ A version on Tetris made in the Go programming lanuage, powered by the [Ebitengi
 # Features
 - [x] Collision
 - [x] Hard drop
+- [x] Better movement
+- [ ] Ghost piece
 - [ ] 7 Bag system
 - [ ] Game loop
 - [ ] Score
