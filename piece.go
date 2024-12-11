@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -18,19 +19,19 @@ var arr int = 2
 var das int = 10
 
 func (p *Piece) Moved(dir [2]int) Piece {
-    return Piece{
-      p.colourIndex,
-      p.rotationIndex,
-      AddVec2(p.position, dir),
-    }
+	return Piece{
+		p.colourIndex,
+		p.rotationIndex,
+		AddVec2(p.position, dir),
+	}
 }
 
 func (p *Piece) Rotated(newRotIndex int) Piece {
-    return Piece{
-      p.colourIndex,
-      newRotIndex,
-      p.position,
-    }
+	return Piece{
+		p.colourIndex,
+		newRotIndex,
+		p.position,
+	}
 }
 func IsFree(p Piece) bool {
 	var positions [][2]int
@@ -43,7 +44,7 @@ func IsFree(p Piece) bool {
 			return false
 		}
 	}
-  return true
+	return true
 }
 
 func UpdateInputs() {
@@ -93,9 +94,9 @@ func PieceUpdate() {
 		dirTimers[1] = 0
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
-    if IsFree(currentPiece.Moved([2]int{0, 1})) {
+		if IsFree(currentPiece.Moved([2]int{0, 1})) {
 			currentPiece.position[1] += 1
-      if !IsFree(currentPiece.Moved([2]int{0, 1})) {
+			if !IsFree(currentPiece.Moved([2]int{0, 1})) {
 				for _, pos := range PIECES[currentPiece.colourIndex][currentPiece.rotationIndex] {
 					blockPos := AddVec2(pos, currentPiece.position)
 					collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos, false})
@@ -103,13 +104,13 @@ func PieceUpdate() {
 				CheckBoard()
 				currentPiece = nextPiece
 				nextPiece = GetNextPiece()
-        UpdateGhost()
+				UpdateGhost()
 			}
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
 		for {
-      if !IsFree(currentPiece.Moved([2]int{0, 1})) {
+			if !IsFree(currentPiece.Moved([2]int{0, 1})) {
 				break
 			}
 			currentPiece.position[1] += 1
@@ -121,39 +122,43 @@ func PieceUpdate() {
 		CheckBoard()
 		currentPiece = nextPiece
 		nextPiece = GetNextPiece()
-    UpdateGhost()
+		UpdateGhost()
 	}
+	var newRotIndex = currentPiece.rotationIndex
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		newRotIndex := (currentPiece.rotationIndex + 3) % 4
-    if IsFree(currentPiece.Rotated(newRotIndex)) {
-			currentPiece.rotationIndex = newRotIndex
-      UpdateGhost()
-		}
+		newRotIndex = (currentPiece.rotationIndex + 3) % 4
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-		newRotIndex := (currentPiece.rotationIndex + 1) % 4
-    if IsFree(currentPiece.Rotated(newRotIndex)) {
-			currentPiece.rotationIndex = newRotIndex
-      UpdateGhost()
+		newRotIndex = (currentPiece.rotationIndex + 1) % 4
+	}
+	if newRotIndex != currentPiece.rotationIndex {
+		var kickIndex int
+		if newRotIndex == (currentPiece.rotationIndex+1)%4 {
+			kickIndex = currentPiece.rotationIndex * 2
+		} else if newRotIndex == (currentPiece.rotationIndex+3)%4 {
+			kickIndex = currentPiece.rotationIndex*2 + 1
+		}
+		for _, kick := range KICKS[kickIndex] {
+			log.Println(kick)
 		}
 	}
 }
 
 func MovePiece(dir [2]int) {
-  if IsFree(currentPiece.Moved(dir)) {
+	if IsFree(currentPiece.Moved(dir)) {
 		currentPiece.position[0] += dir[0]
 		currentPiece.position[1] += dir[1]
-    UpdateGhost()
-  }
+		UpdateGhost()
+	}
 }
 
 func UpdateGhost() {
-  ghostPieceHeight = -1
-  for {
-    if IsFree(currentPiece.Moved([2]int{0, ghostPieceHeight + 1})) {
-      ghostPieceHeight++
-    } else {
-      break
-    }
-  }
+	ghostPieceHeight = -1
+	for {
+		if IsFree(currentPiece.Moved([2]int{0, ghostPieceHeight + 1})) {
+			ghostPieceHeight++
+		} else {
+			break
+		}
+	}
 }
