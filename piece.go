@@ -17,32 +17,33 @@ var arr int = 2
 // The delay before the piece starts auto shifting
 var das int = 10
 
-func (p *Piece) CanMove(dir [2]int) bool {
+func (p *Piece) Moved(dir [2]int) Piece {
+    return Piece{
+      p.colourIndex,
+      p.rotationIndex,
+      AddVec2(p.position, dir),
+    }
+}
+
+func (p *Piece) Rotated(newRotIndex int) Piece {
+    return Piece{
+      p.colourIndex,
+      newRotIndex,
+      p.position,
+    }
+}
+func IsFree(p Piece) bool {
 	var positions [][2]int
 	for _, block := range collision {
 		positions = append(positions, block.position)
 	}
 	for _, block_offset := range PIECES[p.colourIndex][p.rotationIndex] {
-		block_position := [2]int{block_offset[0] + p.position[0] + dir[0], block_offset[1] + p.position[1] + dir[1]}
-		if slices.Contains(positions, block_position) {
-			return false
-		}
-	}
-	return true
-}
-
-func (p *Piece) CanRotate(rotIndex int) bool {
-	var positions [][2]int
-	for _, block := range collision {
-		positions = append(positions, block.position)
-	}
-	for _, block_offset := range PIECES[p.colourIndex][rotIndex] {
 		block_position := [2]int{block_offset[0] + p.position[0], block_offset[1] + p.position[1]}
 		if slices.Contains(positions, block_position) {
 			return false
 		}
 	}
-	return true
+  return true
 }
 
 func UpdateInputs() {
@@ -92,9 +93,9 @@ func PieceUpdate() {
 		dirTimers[1] = 0
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
-		if currentPiece.CanMove([2]int{0, 1}) {
+    if IsFree(currentPiece.Moved([2]int{0, 1})) {
 			currentPiece.position[1] += 1
-			if !currentPiece.CanMove([2]int{0, 1}) {
+      if !IsFree(currentPiece.Moved([2]int{0, 1})) {
 				for _, pos := range PIECES[currentPiece.colourIndex][currentPiece.rotationIndex] {
 					blockPos := AddVec2(pos, currentPiece.position)
 					collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos, false})
@@ -108,7 +109,7 @@ func PieceUpdate() {
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
 		for {
-			if !currentPiece.CanMove([2]int{0, 1}) {
+      if !IsFree(currentPiece.Moved([2]int{0, 1})) {
 				break
 			}
 			currentPiece.position[1] += 1
@@ -124,14 +125,14 @@ func PieceUpdate() {
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
 		newRotIndex := (currentPiece.rotationIndex + 3) % 4
-		if currentPiece.CanRotate(newRotIndex) {
+    if IsFree(currentPiece.Rotated(newRotIndex)) {
 			currentPiece.rotationIndex = newRotIndex
       UpdateGhost()
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
 		newRotIndex := (currentPiece.rotationIndex + 1) % 4
-		if currentPiece.CanRotate(newRotIndex) {
+    if IsFree(currentPiece.Rotated(newRotIndex)) {
 			currentPiece.rotationIndex = newRotIndex
       UpdateGhost()
 		}
@@ -139,7 +140,7 @@ func PieceUpdate() {
 }
 
 func MovePiece(dir [2]int) {
-	if currentPiece.CanMove(dir) {
+  if IsFree(currentPiece.Moved(dir)) {
 		currentPiece.position[0] += dir[0]
 		currentPiece.position[1] += dir[1]
     UpdateGhost()
@@ -149,7 +150,7 @@ func MovePiece(dir [2]int) {
 func UpdateGhost() {
   ghostPieceHeight = -1
   for {
-    if currentPiece.CanMove([2]int{0, ghostPieceHeight + 1}) {
+    if IsFree(currentPiece.Moved([2]int{0, ghostPieceHeight + 1})) {
       ghostPieceHeight++
     } else {
       break
