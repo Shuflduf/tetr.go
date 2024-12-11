@@ -1,15 +1,20 @@
 package main
 
 import (
+	"bytes"
+	_ "embed"
 	"image"
+	_ "image/png"
 	"log"
-	"math/rand/v2"
-	"os"
+	"math/rand"
 	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
+
+//go:embed assets/texture_simple.png
+var textureData []byte
 
 const BOARD_WIDTH = 10
 const BOARD_HEIGHT = 20
@@ -45,7 +50,7 @@ func remove(s []CollisionBlock, i int) []CollisionBlock {
 
 func GenerateRandomPiece() Piece {
 	return Piece{
-		rand.IntN(7),
+		rand.Intn(7),
 		0,
 		[2]int{-2, -10},
 	}
@@ -138,16 +143,10 @@ func gameInit() {
 func main() {
 	ebiten.SetWindowSize(1152, 864)
 	ebiten.SetWindowTitle("Hello, World!")
-	ebiten.SetFullscreen(true)
+	// ebiten.SetFullscreen(true)
 
-	// Load the image from a file
-	f, err := os.Open("assets/texture_simple.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	img, _, err := ebitenutil.NewImageFromReader(f)
+	// Load the image from the embedded data
+	img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(textureData))
 	if err != nil {
 		log.Fatal(err)
 	}
