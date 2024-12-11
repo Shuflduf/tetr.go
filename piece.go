@@ -103,8 +103,8 @@ func PieceUpdate() {
 				CheckBoard()
 				currentPiece = nextPiece
 				nextPiece = GetNextPiece()
-				UpdateGhost()
 			}
+      UpdateGhost()
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
