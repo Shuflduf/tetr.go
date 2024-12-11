@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.23'
-
+        
     - name: Get dependencies
       run: go mod tidy
 
@@ -30,9 +30,7 @@ jobs:
         cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
 
     - name: Clean working directory
-      run: |
-        git stash --include-untracked
-        git stash clear
+      run: git clean -fdx
 
     - name: Deploy to web branch
       run: |
@@ -41,7 +39,7 @@ jobs:
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git fetch origin web
         git checkout web
-        git add game.wasm wasm_exec.js
+        git add game.wasm wasm_exec.js go.sum
         git commit -m 'Deploy WASM build'
         git push origin web --force
       env:
