@@ -38,7 +38,10 @@ var texture *ebiten.Image
 var collision []CollisionBlock
 var currentPiece Piece
 var nextPiece Piece
-var heldPiece Piece
+var nullPiece = Piece{-1, 0, [2]int{0, 0}}
+
+// Initiliaze as null piece (index is -1)
+var heldPiece = nullPiece
 var justHeld = false
 
 func AddVec2(first, second [2]int) [2]int {
@@ -100,7 +103,7 @@ func (g *Game) Update() error {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyShift) && !justHeld {
-		if heldPiece == (Piece{}) {
+		if heldPiece == nullPiece {
 			heldPiece = currentPiece
 			heldPiece.position = [2]int{0, 0}
 			heldPiece.rotationIndex = 0
@@ -115,7 +118,6 @@ func (g *Game) Update() error {
 		}
 		justHeld = true
 		UpdateGhost()
-		log.Println(heldPiece)
 	}
 	return nil
 }
@@ -161,7 +163,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
 	}
 	// Draw hold piece
-	if heldPiece != (Piece{}) {
+	if heldPiece != nullPiece {
 		for _, pos := range PIECES[heldPiece.colourIndex][0] {
 			drawOptions := ebiten.DrawImageOptions{}
 			drawOptions.GeoM.Translate(
