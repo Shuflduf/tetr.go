@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
