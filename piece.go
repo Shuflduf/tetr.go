@@ -7,6 +7,15 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+var movingDir [2]bool = [2]bool{false, false}
+var dirTimers [2]int = [2]int{0, 0}
+
+// How many frames between each auto shift
+var arr int = 2
+
+// The delay before the piece starts auto shifting
+var das int = 10
+
 func (p *Piece) CanMove(dir [2]int) bool {
 	var positions [][2]int
 	for _, block := range collision {
@@ -34,17 +43,53 @@ func (p *Piece) CanRotate(rotIndex int) bool {
 	}
 	return true
 }
-func PieceUpdate() {
+
+func UpdateInputs() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
-		if currentPiece.CanMove([2]int{-1, 0}) {
-			currentPiece.position[0] -= 1
+    MovePiece([2]int{-1, 0})
+		movingDir[0] = true
+		movingDir[1] = false
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyD) {
+    MovePiece([2]int{1, 0})
+		movingDir[0] = false
+		movingDir[1] = true
+	} else if inpututil.IsKeyJustReleased(ebiten.KeyA) {
+    movingDir[0] = false
+    if ebiten.IsKeyPressed(ebiten.KeyD) {
+    MovePiece([2]int{-1, 0})
+      movingDir[1] = true
 		}
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
-		if currentPiece.CanMove([2]int{1, 0}) {
-			currentPiece.position[0] += 1
-		}
-	}
+	} else if inpututil.IsKeyJustReleased(ebiten.KeyD) {
+    movingDir[1] = false
+    if ebiten.IsKeyPressed(ebiten.KeyA) {
+      MovePiece([2]int{1, 0})
+      movingDir[0] = true
+    }
+  }
+}
+
+func PieceUpdate() {
+	UpdateInputs()
+  if movingDir[0] {
+    dirTimers[0]++
+    if dirTimers[0] > das {
+      if dirTimers[0] % arr == 0 {
+        MovePiece([2]int{-1, 0})
+      }
+    }
+  } else {
+    dirTimers[0] = 0
+  }
+  if movingDir[1] {
+    dirTimers[1]++
+    if dirTimers[1] > das {
+      if dirTimers[1] % arr == 0 {
+        MovePiece([2]int{1, 0})
+      }
+    }
+  } else {
+    dirTimers[1] = 0
+  }
 	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
 		if currentPiece.CanMove([2]int{0, 1}) {
 			currentPiece.position[1] += 1
@@ -53,9 +98,9 @@ func PieceUpdate() {
 					blockPos := AddVec2(pos, currentPiece.position)
 					collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos, false})
 				}
-        CheckBoard()
-        currentPiece = nextPiece
-        nextPiece = GetNextPiece()
+				CheckBoard()
+				currentPiece = nextPiece
+				nextPiece = GetNextPiece()
 			}
 		}
 	}
@@ -70,9 +115,9 @@ func PieceUpdate() {
 			blockPos := AddVec2(pos, currentPiece.position)
 			collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos, false})
 		}
-    CheckBoard()
+		CheckBoard()
 		currentPiece = nextPiece
-    nextPiece = GetNextPiece()
+		nextPiece = GetNextPiece()
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
 		newRotIndex := (currentPiece.rotationIndex + 3) % 4
@@ -86,4 +131,12 @@ func PieceUpdate() {
 			currentPiece.rotationIndex = newRotIndex
 		}
 	}
+}
+
+func MovePiece(dir [2]int) {
+		if currentPiece.CanMove(dir) {
+			currentPiece.position[0] += dir[0]
+			currentPiece.position[1] += dir[1]
+		}
+
 }

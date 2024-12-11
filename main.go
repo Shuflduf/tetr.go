@@ -115,16 +115,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
 		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
 	}
-  for _, pos := range PIECES[nextPiece.colourIndex][0] {
-    drawOptions := ebiten.DrawImageOptions{}
+	for _, pos := range PIECES[nextPiece.colourIndex][0] {
+		drawOptions := ebiten.DrawImageOptions{}
 		drawOptions.GeoM.Translate(
-			float64(7 + pos[0] + offsetGrid[0])*32,
-			float64(-8 + pos[1] + offsetGrid[1])*32,
+			float64(7+pos[0]+offsetGrid[0])*32,
+			float64(-8+pos[1]+offsetGrid[1])*32,
 		)
 		pieceIndex := nextPiece.colourIndex
 		cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
 		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
-  }
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -146,10 +146,10 @@ func main() {
 	ebiten.SetWindowSize(1152, 864)
 	ebiten.SetWindowTitle("Hello, World!")
 	// ebiten.SetFullscreen(true)
-  InitBag()
-  currentPiece = GetNextPiece()
-  nextPiece = GetNextPiece()
-  
+	InitBag()
+	currentPiece = GetNextPiece()
+	nextPiece = GetNextPiece()
+
 	// Load the image from the embedded data
 	img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(textureData))
 	if err != nil {
