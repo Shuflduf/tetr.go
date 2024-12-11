@@ -94,9 +94,9 @@ func ClearLines(lines []int) {
 
 func (g *Game) Update() error {
 	PieceUpdate()
-  if inpututil.IsKeyJustPressed(ebiten.KeyF) {
-    ebiten.SetFullscreen(!ebiten.IsFullscreen())
-  }
+	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
+		ebiten.SetFullscreen(!ebiten.IsFullscreen())
+	}
 	return nil
 }
 

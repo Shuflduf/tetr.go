@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-	_ "log"
 	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -135,28 +133,32 @@ func PieceUpdate() {
 	if newRotIndex != currentPiece.rotationIndex {
 		if IsFree(currentPiece.Rotated(newRotIndex)) {
 			currentPiece.rotationIndex = newRotIndex
-      UpdateGhost()
+			UpdateGhost()
 			return
 		}
 		var kickIndex int
 		if newRotIndex == (currentPiece.rotationIndex+1)%4 {
-			kickIndex = currentPiece.rotationIndex * 2 - 1
+			kickIndex = currentPiece.rotationIndex*2 - 1
 		} else if newRotIndex == (currentPiece.rotationIndex+3)%4 {
-			kickIndex = currentPiece.rotationIndex*2 
+			kickIndex = currentPiece.rotationIndex * 2
 		}
 		newPieceUnrotated := currentPiece.Rotated(newRotIndex)
-		for _, kick := range KICKS[kickIndex] {
+		var table [8][4][2]int
+		if currentPiece.colourIndex == 4 {
+			table = I_KICKS
+		} else {
+			table = KICKS
+		}
+		for _, kick := range table[kickIndex] {
 			flippedKick := [2]int{kick[0], -kick[1]}
 			newPiece := newPieceUnrotated.Moved(flippedKick)
 			if IsFree(newPiece) {
-        log.Println("Rotation from: ", currentPiece.rotationIndex, " to ", newRotIndex, " using kick index ", kickIndex)
 				currentPiece.rotationIndex = newRotIndex
 				currentPiece.position = AddVec2(currentPiece.position, flippedKick)
-        UpdateGhost()
+				UpdateGhost()
 				return
 			}
 		}
-    log.Println("Rotation failed from: ", currentPiece.rotationIndex, " to ", newRotIndex, " using kick index ", kickIndex)
 	}
 }
 
