@@ -122,6 +122,7 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	offsetGrid := [2]int{14, 10}
+	// Draw grid
 	for _, block := range collision {
 		drawOptions := ebiten.DrawImageOptions{}
 		drawOptions.GeoM.Translate(float64(block.position[0]+offsetGrid[0])*32, float64(block.position[1]+offsetGrid[1])*32)
@@ -129,6 +130,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
 		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
 	}
+	// Draw current piece
 	for _, pos := range PIECES[currentPiece.colourIndex][currentPiece.rotationIndex] {
 		drawOptions := ebiten.DrawImageOptions{}
 		drawOptions.GeoM.Translate(
@@ -139,6 +141,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
 		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
 
+		// Reuse code to draw ghost
 		drawOptions.ColorScale.ScaleAlpha(0.2)
 		drawOptions.GeoM.Translate(
 			0.0,
@@ -146,6 +149,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		)
 		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
 	}
+	// Draw next piece
 	for _, pos := range PIECES[nextPiece.colourIndex][0] {
 		drawOptions := ebiten.DrawImageOptions{}
 		drawOptions.GeoM.Translate(
@@ -155,6 +159,22 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		pieceIndex := nextPiece.colourIndex
 		cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
 		screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
+	}
+	// Draw hold piece
+	if heldPiece != (Piece{}) {
+		for _, pos := range PIECES[heldPiece.colourIndex][0] {
+			drawOptions := ebiten.DrawImageOptions{}
+			drawOptions.GeoM.Translate(
+				float64(-11+pos[0]+offsetGrid[0])*32,
+				float64(-8+pos[1]+offsetGrid[1])*32,
+			)
+			if justHeld {
+				drawOptions.ColorScale.ScaleAlpha(0.2)
+			}
+			pieceIndex := heldPiece.colourIndex
+			cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)
+			screen.DrawImage(texture.SubImage(cropRect).(*ebiten.Image), &drawOptions)
+		}
 	}
 }
 
