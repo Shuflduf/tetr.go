@@ -54,7 +54,7 @@ func PieceUpdate() {
 					collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos, false})
 				}
         CheckBoard()
-				currentPiece = GenerateRandomPiece()
+				currentPiece = GetNextPiece()
 			}
 		}
 	}
@@ -70,7 +70,7 @@ func PieceUpdate() {
 			collision = append(collision, CollisionBlock{currentPiece.colourIndex, blockPos, false})
 		}
     CheckBoard()
-		currentPiece = GenerateRandomPiece()
+		currentPiece = GetNextPiece()
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
 		newRotIndex := (currentPiece.rotationIndex + 3) % 4

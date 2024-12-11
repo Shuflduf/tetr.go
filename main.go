@@ -6,7 +6,6 @@ import (
 	"image"
 	_ "image/png"
 	"log"
-	"math/rand"
 	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -36,7 +35,7 @@ type CollisionBlock struct {
 // Atlas texture
 var texture *ebiten.Image
 var collision []CollisionBlock
-var currentPiece Piece = GenerateRandomPiece()
+var currentPiece Piece
 
 func AddVec2(first, second [2]int) [2]int {
 	return [2]int{first[0] + second[0], first[1] + second[1]}
@@ -46,14 +45,6 @@ func AddVec2(first, second [2]int) [2]int {
 func remove(s []CollisionBlock, i int) []CollisionBlock {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
-}
-
-func GenerateRandomPiece() Piece {
-	return Piece{
-		rand.Intn(7),
-		0,
-		[2]int{-2, -10},
-	}
 }
 
 func CheckBoard() {
@@ -144,6 +135,8 @@ func main() {
 	ebiten.SetWindowSize(1152, 864)
 	ebiten.SetWindowTitle("Hello, World!")
 	// ebiten.SetFullscreen(true)
+  InitBag()
+  currentPiece = GetNextPiece()
 
 	// Load the image from the embedded data
 	img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(textureData))
