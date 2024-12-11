@@ -29,15 +29,19 @@ jobs:
         env GOOS=js GOARCH=wasm go build -o game.wasm shuflduf.xyz/tetr.go
         cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
 
+    - name: Clean working directory
+      run: |
+        git stash --include-untracked
+        git stash clear
+
     - name: Deploy to web branch
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git stash
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git fetch origin web
         git checkout web
-        git stash pop
+        git stash pop || true
         git add game.wasm wasm_exec.js
         git commit -m 'Deploy WASM build'
         git push origin web --force
