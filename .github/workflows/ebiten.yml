@@ -19,7 +19,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.23'
+        go-version: '1.19'
 
     - name: Get dependencies
       run: go mod tidy
@@ -28,6 +28,8 @@ jobs:
       run: |
         env GOOS=js GOARCH=wasm go build -o game.wasm shuflduf.xyz/tetr.go
         cp $(go env GOROOT)/misc/wasm/wasm_exec.js .
+        mkdir wasm_files
+        mv game.wasm wasm_exec.js wasm_files/
 
     - name: Deploy to web branch
       run: |
@@ -36,6 +38,7 @@ jobs:
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git fetch origin web
         git checkout -b web origin/web
+        mv wasm_files/* .
         git add game.wasm wasm_exec.js
         git commit -m 'Deploy WASM build'
         git push --set-upstream origin web --force
