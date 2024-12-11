@@ -6,6 +6,7 @@ A version on Tetris made in the Go programming lanuage, powered by the [Ebitengi
 - [x] Collision
 - [x] Hard drop
 - [ ] 7 Bag system
+- [ ] Game loop
 - [ ] Score
 - [ ] **Juice**
   - [ ] Particles
