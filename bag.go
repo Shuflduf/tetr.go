@@ -24,9 +24,9 @@ func InitBag() {
 }
 
 func GetNextPiece() Piece {
-  if len(bag) <= 0 {
-    InitBag()
-  }
+	if len(bag) <= 0 {
+		InitBag()
+	}
 	lastValue := bag[len(bag)-1]
 	bag = slices.Delete(bag, len(bag)-1, len(bag))
 	return lastValue

@@ -103,8 +103,9 @@ func PieceUpdate() {
 				CheckBoard()
 				currentPiece = nextPiece
 				nextPiece = GetNextPiece()
+				justHeld = false
 			}
-      UpdateGhost()
+			UpdateGhost()
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
@@ -121,6 +122,7 @@ func PieceUpdate() {
 		CheckBoard()
 		currentPiece = nextPiece
 		nextPiece = GetNextPiece()
+		justHeld = false
 		UpdateGhost()
 	}
 	var newRotIndex = currentPiece.rotationIndex

@@ -38,6 +38,8 @@ var texture *ebiten.Image
 var collision []CollisionBlock
 var currentPiece Piece
 var nextPiece Piece
+var heldPiece Piece
+var justHeld = false
 
 func AddVec2(first, second [2]int) [2]int {
 	return [2]int{first[0] + second[0], first[1] + second[1]}
@@ -96,6 +98,24 @@ func (g *Game) Update() error {
 	PieceUpdate()
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyShift) && !justHeld {
+		if heldPiece == (Piece{}) {
+			heldPiece = currentPiece
+			heldPiece.position = [2]int{0, 0}
+			heldPiece.rotationIndex = 0
+			currentPiece = nextPiece
+			nextPiece = GetNextPiece()
+		} else {
+			t := currentPiece
+			currentPiece = heldPiece
+			heldPiece = t
+			heldPiece.position = [2]int{0, 0}
+			currentPiece.position = startingPos
+		}
+		justHeld = true
+		UpdateGhost()
+		log.Println(heldPiece)
 	}
 	return nil
 }
