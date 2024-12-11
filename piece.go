@@ -46,50 +46,50 @@ func (p *Piece) CanRotate(rotIndex int) bool {
 
 func UpdateInputs() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
-    MovePiece([2]int{-1, 0})
+		MovePiece([2]int{-1, 0})
 		movingDir[0] = true
 		movingDir[1] = false
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyD) {
-    MovePiece([2]int{1, 0})
+		MovePiece([2]int{1, 0})
 		movingDir[0] = false
 		movingDir[1] = true
 	} else if inpututil.IsKeyJustReleased(ebiten.KeyA) {
-    movingDir[0] = false
-    if ebiten.IsKeyPressed(ebiten.KeyD) {
-    MovePiece([2]int{-1, 0})
-      movingDir[1] = true
+		movingDir[0] = false
+		if ebiten.IsKeyPressed(ebiten.KeyD) {
+			MovePiece([2]int{-1, 0})
+			movingDir[1] = true
 		}
 	} else if inpututil.IsKeyJustReleased(ebiten.KeyD) {
-    movingDir[1] = false
-    if ebiten.IsKeyPressed(ebiten.KeyA) {
-      MovePiece([2]int{1, 0})
-      movingDir[0] = true
-    }
-  }
+		movingDir[1] = false
+		if ebiten.IsKeyPressed(ebiten.KeyA) {
+			MovePiece([2]int{1, 0})
+			movingDir[0] = true
+		}
+	}
 }
 
 func PieceUpdate() {
 	UpdateInputs()
-  if movingDir[0] {
-    dirTimers[0]++
-    if dirTimers[0] > das {
-      if dirTimers[0] % arr == 0 {
-        MovePiece([2]int{-1, 0})
-      }
-    }
-  } else {
-    dirTimers[0] = 0
-  }
-  if movingDir[1] {
-    dirTimers[1]++
-    if dirTimers[1] > das {
-      if dirTimers[1] % arr == 0 {
-        MovePiece([2]int{1, 0})
-      }
-    }
-  } else {
-    dirTimers[1] = 0
-  }
+	if movingDir[0] {
+		dirTimers[0]++
+		if dirTimers[0] > das {
+			if dirTimers[0]%arr == 0 {
+				MovePiece([2]int{-1, 0})
+			}
+		}
+	} else {
+		dirTimers[0] = 0
+	}
+	if movingDir[1] {
+		dirTimers[1]++
+		if dirTimers[1] > das {
+			if dirTimers[1]%arr == 0 {
+				MovePiece([2]int{1, 0})
+			}
+		}
+	} else {
+		dirTimers[1] = 0
+	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
 		if currentPiece.CanMove([2]int{0, 1}) {
 			currentPiece.position[1] += 1
@@ -134,9 +134,9 @@ func PieceUpdate() {
 }
 
 func MovePiece(dir [2]int) {
-		if currentPiece.CanMove(dir) {
-			currentPiece.position[0] += dir[0]
-			currentPiece.position[1] += dir[1]
-		}
+	if currentPiece.CanMove(dir) {
+		currentPiece.position[0] += dir[0]
+		currentPiece.position[1] += dir[1]
+	}
 
 }
