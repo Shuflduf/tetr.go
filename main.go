@@ -140,7 +140,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			float64(pos[1]+offsetGrid[1]+currentPiece.position[1])*32,
 		)
 		value := (((((float64(lockDelayTimer) / float64(lockDelay)) - 0.5) * -1) + 0.5) * 0.7) + 0.3
-    // yeah this is deprecated
+		// yeah this is deprecated
 		drawOptions.ColorM.ChangeHSV(0.0, 1.0, value)
 		pieceIndex := currentPiece.colourIndex
 		cropRect := image.Rect(32*pieceIndex, 0, 32*(pieceIndex+1), 32)

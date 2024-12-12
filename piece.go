@@ -17,12 +17,16 @@ var maxLockDelayTimer = 0
 var onGround = false
 var gravityDelay = 60
 var gravityDelayTimer = 0
+var softDropping = false
 
 // How many frames between each auto shift
 var arr = 2
 
 // The delay before the piece starts auto shifting
 var das = 10
+
+// How much gravity gets multiplied by when soft dropping
+var sdf = 10
 
 func (p *Piece) Moved(dir [2]int) Piece {
 	return Piece{
@@ -96,6 +100,10 @@ func UpdateInputs() {
 			movingDir[0] = true
 		}
 	}
+	softDropping = ebiten.IsKeyPressed(ebiten.KeyW)
+	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
+		gravityDelayTimer = gravityDelay
+	}
 }
 
 func PieceUpdate() {
@@ -121,16 +129,21 @@ func PieceUpdate() {
 		dirTimers[1] = 0
 	}
 	gravityDelayTimer++
-	if inpututil.IsKeyJustPressed(ebiten.KeyW) || gravityDelayTimer > gravityDelay {
+	actualGravityDelay := gravityDelay
+	if softDropping {
+		actualGravityDelay /= sdf
+	}
+	if gravityDelayTimer > actualGravityDelay {
 		if IsFree(currentPiece.Moved([2]int{0, 1})) {
 			currentPiece.position[1] += 1
 			UpdateGhost()
 		}
-		if gravityDelayTimer > gravityDelay {
-			gravityDelayTimer = 0
-		}
+		gravityDelayTimer = 0
 	}
 	if currentPiece.TouchingGround() {
+		if softDropping {
+			lockDelayTimer += 2
+		}
 		lockDelayTimer++
 		onGround = true
 		if lockDelayTimer > lockDelay {
