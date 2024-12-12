@@ -11,6 +11,7 @@ var bag []Piece
 var startingPos = [2]int{-2, -10}
 
 func InitBag() {
+	bag = []Piece{}
 	for i := 0; i < BAG_SIZE; i++ {
 		bag = append(bag, Piece{
 			i,

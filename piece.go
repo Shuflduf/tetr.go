@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -174,12 +175,13 @@ func PieceUpdate() {
 			UpdateGhost()
 			return
 		}
-		var kickIndex int
-		if newRotIndex == (currentPiece.rotationIndex+1)%4 {
-			kickIndex = currentPiece.rotationIndex*2 - 1
-		} else if newRotIndex == (currentPiece.rotationIndex+3)%4 {
-			kickIndex = currentPiece.rotationIndex * 2
-		}
+		kickIndex := GetKickIndex(currentPiece.rotationIndex, newRotIndex)
+		// var kickIndex int
+		// if newRotIndex == (currentPiece.rotationIndex+1)%4 {
+		// 	kickIndex = currentPiece.rotationIndex*2
+		// } else if newRotIndex == (currentPiece.rotationIndex+3)%4 {
+		// 	kickIndex = currentPiece.rotationIndex * 2 + 1
+		// }
 		newPieceUnrotated := currentPiece.Rotated(newRotIndex)
 		var table [8][4][2]int
 		if currentPiece.colourIndex == 4 {
@@ -187,6 +189,7 @@ func PieceUpdate() {
 		} else {
 			table = KICKS
 		}
+		log.Println("Before: ", currentPiece.rotationIndex, " After: ", newRotIndex, " Which is: ", kickIndex)
 		for _, kick := range table[kickIndex] {
 			flippedKick := [2]int{kick[0], -kick[1]}
 			newPiece := newPieceUnrotated.Moved(flippedKick)
@@ -199,6 +202,16 @@ func PieceUpdate() {
 			}
 		}
 	}
+}
+
+func GetKickIndex(before, after int) int {
+	var kickIndex int
+	if after == (before+1)%4 {
+		kickIndex = before * 2
+	} else if after == (before+3)%4 {
+		kickIndex = (before*2 + 7) % 8
+	}
+	return kickIndex
 }
 
 func HardDrop() {
