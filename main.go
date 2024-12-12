@@ -81,7 +81,6 @@ func CheckBoard() {
 func ResetGame() {
 	collision = []CollisionBlock{}
 	heldPiece = nullPiece
-	gravityDelayTimer = 0
 	gameInit()
 }
 
