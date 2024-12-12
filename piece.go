@@ -144,9 +144,6 @@ func PieceUpdate() {
 		gravityDelayTimer = 0
 	}
 	if currentPiece.TouchingGround() {
-		if softDropping {
-			lockDelayTimer += 2
-		}
 		lockDelayTimer++
 		onGround = true
 		if lockDelayTimer > lockDelay {
