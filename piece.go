@@ -176,12 +176,6 @@ func PieceUpdate() {
 			return
 		}
 		kickIndex := GetKickIndex(currentPiece.rotationIndex, newRotIndex)
-		// var kickIndex int
-		// if newRotIndex == (currentPiece.rotationIndex+1)%4 {
-		// 	kickIndex = currentPiece.rotationIndex*2
-		// } else if newRotIndex == (currentPiece.rotationIndex+3)%4 {
-		// 	kickIndex = currentPiece.rotationIndex * 2 + 1
-		// }
 		newPieceUnrotated := currentPiece.Rotated(newRotIndex)
 		var table [8][4][2]int
 		if currentPiece.colourIndex == 4 {
