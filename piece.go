@@ -15,6 +15,8 @@ var maxLockDelay = 120
 var lockDelayTimer = 0
 var maxLockDelayTimer = 0
 var onGround = false
+var gravityDelay = 60
+var gravityDelayTimer = 0
 
 // How many frames between each auto shift
 var arr = 2
@@ -118,10 +120,14 @@ func PieceUpdate() {
 	} else {
 		dirTimers[1] = 0
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
+	gravityDelayTimer++
+	if inpututil.IsKeyJustPressed(ebiten.KeyW) || gravityDelayTimer > gravityDelay {
 		if IsFree(currentPiece.Moved([2]int{0, 1})) {
 			currentPiece.position[1] += 1
 			UpdateGhost()
+		}
+		if gravityDelayTimer > gravityDelay {
+			gravityDelayTimer = 0
 		}
 	}
 	if currentPiece.TouchingGround() {
@@ -175,6 +181,7 @@ func PieceUpdate() {
 				currentPiece.rotationIndex = newRotIndex
 				currentPiece.position = AddVec2(currentPiece.position, flippedKick)
 				UpdateGhost()
+				lockDelayTimer = 0
 				return
 			}
 		}
