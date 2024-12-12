@@ -58,6 +58,9 @@ func (p *Piece) SetPiece() {
 	nextPiece = GetNextPiece()
 	justHeld = false
 	UpdateGhost()
+	if !IsFree(currentPiece) {
+		ResetGame()
+	}
 }
 
 func (p *Piece) TouchingGround() bool {

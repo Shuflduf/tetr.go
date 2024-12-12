@@ -78,6 +78,13 @@ func CheckBoard() {
 	ClearLines(foundRows)
 }
 
+func ResetGame() {
+	collision = []CollisionBlock{}
+	heldPiece = nullPiece
+	gravityDelayTimer = 0
+	gameInit()
+}
+
 func ClearLines(lines []int) {
 	slices.Sort(lines)
 
