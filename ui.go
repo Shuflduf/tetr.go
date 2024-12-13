@@ -5,12 +5,14 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 )
 
 var defaultFont text.Face
+var controlsHidden = false
 
 func init() {
 	tt, err := opentype.Parse(fonts.PressStart2P_ttf)
@@ -30,6 +32,15 @@ func init() {
 	defaultFont = text.NewGoXFace(fontFace)
 }
 
+func UIUpdate() {
+  if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+    x, y := ebiten.CursorPosition()
+    if x < 200 && y > 500 {
+      controlsHidden = true
+    }
+  }
+}
+
 func UI() *ebiten.Image {
 	img := ebiten.NewImage(896, 672)
 	drawOptions := text.DrawOptions{}
@@ -40,9 +51,12 @@ func UI() *ebiten.Image {
 }
 
 func Controls(img *ebiten.Image) {
+  if controlsHidden {
+    return
+  }
 	const HEIGHT = 30
 	const SCALE = 0.6
-	offset := [2]int{30, 875}
+	offset := [2]int{30, 860}
 	controlsList := []string{
 		"A - LEFT",
 		"D - RIGHT",
@@ -51,6 +65,7 @@ func Controls(img *ebiten.Image) {
 		"S - SOFT",
 		"W - HARD",
 		"SHIFT - HOLD",
+    "CLICK TO HIDE",
 	}
 	for i, item := range controlsList {
 		drawOptions := text.DrawOptions{}

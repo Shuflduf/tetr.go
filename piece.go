@@ -221,8 +221,8 @@ func MovePiece(dir [2]int) {
 		currentPiece.position[0] += dir[0]
 		currentPiece.position[1] += dir[1]
 		UpdateGhost()
+		lockDelayTimer = 0
 	}
-	lockDelayTimer = 0
 }
 
 func UpdateGhost() {
