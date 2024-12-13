@@ -58,6 +58,7 @@ func (p *Piece) SetPiece() {
 	nextPiece = GetNextPiece()
 	justHeld = false
 	UpdateGhost()
+  lockDelayTimer = 0
 	if !IsFree(currentPiece) {
 		ResetGame()
 	}

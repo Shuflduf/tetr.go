@@ -7,10 +7,12 @@ A version on Tetris made in the Go programming lanuage, powered by the [Ebitengi
 - [x] Hard drop
 - [x] Better movement
     - [x] SRS Kicks
-    - [ ] Fix SRS Kicks because you can't DT cannon rn :(
+    - [x] Fix SRS Kicks because you can't DT cannon rn :(
 - [x] Ghost piece
 - [x] 7 Bag system
+- [x] Lock delay
 - [x] Game loop
+- [x] UI
 - [ ] Score
 - [ ] **Juice**
   - [ ] Particles
