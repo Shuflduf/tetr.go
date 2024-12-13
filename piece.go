@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -50,14 +51,14 @@ func (p *Piece) SetPiece() {
 	lockDelayTimer = 0
 	maxLockDelayTimer = 0
 	onGround = false
+	if lastKick >= 0 && p.colourIndex == 6 {
+		CheckTSpin()
+	}
 	for _, pos := range PIECES[p.colourIndex][p.rotationIndex] {
 		blockPos := AddVec2(pos, p.position)
 		collision = append(collision, CollisionBlock{p.colourIndex, blockPos, false})
 	}
 	CheckBoard()
-	if lastKick >= 0 {
-		CheckTSpin()
-	}
 	currentPiece = nextPiece
 	nextPiece = GetNextPiece()
 	justHeld = false
@@ -76,9 +77,9 @@ func CheckTSpin() {
 	var current3X3 [][2]int
 	for _, item := range [4][2]int{
 		{0, 0},
-		{0, 2},
 		{2, 0},
 		{2, 2},
+		{0, 2},
 	} {
 		current3X3 = append(current3X3, AddVec2(item, currentPiece.position))
 	}
@@ -129,7 +130,7 @@ func CheckTSpin() {
 			}
 		}
 
-    lastTSpin = 0
+		lastTSpin = 0
 	}
 }
 
@@ -138,7 +139,7 @@ func IsPositionFree(pos [2]int) bool {
 	for _, block := range collision {
 		positions = append(positions, block.position)
 	}
-	return slices.Contains(positions, pos)
+	return !slices.Contains(positions, pos)
 }
 
 func IsFree(p Piece) bool {
