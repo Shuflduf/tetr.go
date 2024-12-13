@@ -60,7 +60,7 @@ func Score(img *ebiten.Image) {
   drawOptions.GeoM.Scale(SCALE, SCALE)
   text.Draw(img, "SCORE: " + strconv.Itoa(score), defaultFont, &drawOptions)
   drawOptions.GeoM.Translate(0, 30 * SCALE)
-  text.Draw(img, "HIGH: " + strconv.Itoa(score), defaultFont, &drawOptions)
+  text.Draw(img, "HIGH: " + strconv.Itoa(highScore), defaultFont, &drawOptions)
 }
 
 func Controls(img *ebiten.Image) {
