@@ -1,7 +1,5 @@
 package main
 
-import "log"
-
 var basic = map[int]int{
 	1: 100,
 	2: 300,
@@ -31,7 +29,6 @@ var score = 0
 var highScore = 0
 
 func UpdateScore() {
-	log.Println(lastTSpin)
 	switch lastTSpin {
 	case 0:
 		if linesJustCleared > 0 {
