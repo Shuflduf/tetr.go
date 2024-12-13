@@ -13,7 +13,8 @@ A version on Tetris made in the Go programming lanuage, powered by the [Ebitengi
 - [x] Lock delay
 - [x] Game loop
 - [x] UI
-- [ ] Score
+- [x] Score
+- [x] TSpins
 - [ ] **Juice**
   - [ ] Particles
   - [ ] Sound
