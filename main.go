@@ -129,7 +129,7 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	DrawText(screen)
+	screen.DrawImage(UI(), &ebiten.DrawImageOptions{})
 	offsetGrid := [2]int{14, 10}
 	// Draw grid
 	for _, block := range collision {
