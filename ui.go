@@ -32,6 +32,31 @@ func init() {
 
 func UI() *ebiten.Image {
 	img := ebiten.NewImage(896, 672)
-	text.Draw(img, "AAAA", defaultFont, &text.DrawOptions{})
+	drawOptions := text.DrawOptions{}
+	drawOptions.GeoM.Translate(10, 10)
+	text.Draw(img, "TETR.GO", defaultFont, &drawOptions)
+	Controls(img)
 	return img
+}
+
+func Controls(img *ebiten.Image) {
+	const HEIGHT = 30
+	const SCALE = 0.6
+	offset := [2]int{30, 875}
+	controlsList := []string{
+		"A - LEFT",
+		"D - RIGHT",
+		"L ARROW - CCW",
+		"R ARROW - CW",
+		"S - SOFT",
+		"W - HARD",
+		"SHIFT - HOLD",
+	}
+	for i, item := range controlsList {
+		drawOptions := text.DrawOptions{}
+		drawOptions.GeoM.Translate(float64(offset[0]), float64((i*HEIGHT)+offset[1]))
+		drawOptions.GeoM.Scale(SCALE, SCALE)
+		drawOptions.ColorScale.Scale(0.3, 0.3, 0.3, 1.0)
+		text.Draw(img, item, defaultFont, &drawOptions)
+	}
 }
