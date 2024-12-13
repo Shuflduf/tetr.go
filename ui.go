@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
@@ -10,6 +11,8 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 )
+
+const SCALE = 0.6
 
 var defaultFont text.Face
 var controlsHidden = false
@@ -47,7 +50,17 @@ func UI() *ebiten.Image {
 	drawOptions.GeoM.Translate(10, 10)
 	text.Draw(img, "TETR.GO", defaultFont, &drawOptions)
 	Controls(img)
+  Score(img)
 	return img
+}
+
+func Score(img *ebiten.Image) {
+  drawOptions := text.DrawOptions{}
+  drawOptions.GeoM.Translate(1100, 1040)
+  drawOptions.GeoM.Scale(SCALE, SCALE)
+  text.Draw(img, "SCORE: " + strconv.Itoa(score), defaultFont, &drawOptions)
+  drawOptions.GeoM.Translate(0, 30 * SCALE)
+  text.Draw(img, "HIGH: " + strconv.Itoa(score), defaultFont, &drawOptions)
 }
 
 func Controls(img *ebiten.Image) {
@@ -55,7 +68,6 @@ func Controls(img *ebiten.Image) {
     return
   }
 	const HEIGHT = 30
-	const SCALE = 0.6
 	offset := [2]int{30, 860}
 	controlsList := []string{
 		"A - LEFT",

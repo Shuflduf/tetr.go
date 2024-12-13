@@ -76,12 +76,14 @@ func CheckBoard() {
 		}
 	}
 	ClearLines(foundRows)
+  linesJustCleared = len(foundRows)
+  UpdateScore()
 }
 
 func ResetGame() {
 	collision = []CollisionBlock{}
 	heldPiece = nullPiece
-	gameInit()
+	GameInit()
 }
 
 func ClearLines(lines []int) {
@@ -195,7 +197,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return 896, 672
 }
 
-func gameInit() {
+func GameInit() {
 	for i := -HALF_WIDTH - 1; i < HALF_WIDTH+1; i++ {
 		collision = append(collision, CollisionBlock{7, [2]int{i, HALF_HEIGHT}, true})
 	}
@@ -207,6 +209,7 @@ func gameInit() {
 	InitBag()
 	currentPiece = GetNextPiece()
 	nextPiece = GetNextPiece()
+  score = 0
 	UpdateGhost()
 }
 
@@ -222,7 +225,7 @@ func main() {
 	texture = img
 	game := &Game{}
 
-	gameInit()
+	GameInit()
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
