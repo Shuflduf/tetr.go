@@ -30,12 +30,8 @@ func init() {
 	defaultFont = text.NewGoXFace(fontFace)
 }
 
-// func DrawText(screen *ebiten.Image) {
-// 	ebitenutil.DebugPrint(screen, "NO")
-// }
-
 func UI() *ebiten.Image {
-	img := ebiten.NewImage(200, 200)
+	img := ebiten.NewImage(896, 672)
 	text.Draw(img, "AAAA", defaultFont, &text.DrawOptions{})
 	return img
 }

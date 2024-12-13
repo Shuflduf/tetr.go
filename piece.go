@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -183,7 +182,6 @@ func PieceUpdate() {
 		} else {
 			table = KICKS
 		}
-		log.Println("Before: ", currentPiece.rotationIndex, " After: ", newRotIndex, " Which is: ", kickIndex)
 		for _, kick := range table[kickIndex] {
 			flippedKick := [2]int{kick[0], -kick[1]}
 			newPiece := newPieceUnrotated.Moved(flippedKick)
