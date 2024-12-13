@@ -18,6 +18,7 @@ var onGround = false
 var gravityDelay = 60
 var gravityDelayTimer = 0
 var softDropping = false
+var lastKick = 0
 
 // How many frames between each auto shift
 var arr = 2
@@ -54,11 +55,14 @@ func (p *Piece) SetPiece() {
 		collision = append(collision, CollisionBlock{p.colourIndex, blockPos, false})
 	}
 	CheckBoard()
+	if lastKick >= 0 {
+		CheckTSpin()
+	}
 	currentPiece = nextPiece
 	nextPiece = GetNextPiece()
 	justHeld = false
 	UpdateGhost()
-  lockDelayTimer = 0
+	lockDelayTimer = 0
 	if !IsFree(currentPiece) {
 		ResetGame()
 	}
@@ -66,6 +70,75 @@ func (p *Piece) SetPiece() {
 
 func (p *Piece) TouchingGround() bool {
 	return !IsFree(p.Moved([2]int{0, 1}))
+}
+
+func CheckTSpin() {
+	var current3X3 [][2]int
+	for _, item := range [4][2]int{
+		{0, 0},
+		{0, 2},
+		{2, 0},
+		{2, 2},
+	} {
+		current3X3 = append(current3X3, AddVec2(item, currentPiece.position))
+	}
+	var onFront [][2]int
+	var onBack [][2]int
+	for i := 0; i < 2; i++ {
+		onFront = append(onFront, current3X3[(currentPiece.rotationIndex+i)%4])
+		onBack = append(onBack, current3X3[(currentPiece.rotationIndex+i+2)%4])
+	}
+
+	if lastKick == 0 {
+		for _, item := range onFront {
+			if IsPositionFree(item) {
+				lastTSpin = 0
+				return
+			}
+		}
+		for _, item := range onBack {
+			if !IsPositionFree(item) {
+				lastTSpin = 2
+				return
+			}
+		}
+	} else if lastKick == 4 {
+		for _, item := range onBack {
+			if IsPositionFree(item) {
+				lastTSpin = 0
+				return
+			}
+		}
+		for _, item := range onFront {
+			if !IsPositionFree(item) {
+				lastTSpin = 2
+				return
+			}
+		}
+	} else {
+		for _, item := range onBack {
+			if IsPositionFree(item) {
+				lastTSpin = 0
+				return
+			}
+		}
+		for _, item := range onFront {
+			if !IsPositionFree(item) {
+				lastTSpin = 1
+				return
+			}
+		}
+
+    lastTSpin = 0
+	}
+}
+
+func IsPositionFree(pos [2]int) bool {
+	var positions [][2]int
+	for _, block := range collision {
+		positions = append(positions, block.position)
+	}
+	return slices.Contains(positions, pos)
 }
 
 func IsFree(p Piece) bool {
@@ -173,6 +246,7 @@ func PieceUpdate() {
 		if IsFree(currentPiece.Rotated(newRotIndex)) {
 			currentPiece.rotationIndex = newRotIndex
 			UpdateGhost()
+			lastKick = 0
 			return
 		}
 		kickIndex := GetKickIndex(currentPiece.rotationIndex, newRotIndex)
@@ -183,7 +257,7 @@ func PieceUpdate() {
 		} else {
 			table = KICKS
 		}
-		for _, kick := range table[kickIndex] {
+		for i, kick := range table[kickIndex] {
 			flippedKick := [2]int{kick[0], -kick[1]}
 			newPiece := newPieceUnrotated.Moved(flippedKick)
 			if IsFree(newPiece) {
@@ -191,6 +265,7 @@ func PieceUpdate() {
 				currentPiece.position = AddVec2(currentPiece.position, flippedKick)
 				UpdateGhost()
 				lockDelayTimer = 0
+				lastKick = i + 1
 				return
 			}
 		}
@@ -223,6 +298,7 @@ func MovePiece(dir [2]int) {
 		currentPiece.position[1] += dir[1]
 		UpdateGhost()
 		lockDelayTimer = 0
+		lastKick = -1
 	}
 }
 

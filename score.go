@@ -12,6 +12,8 @@ var miniTSpins map[int]int
 var perfectClears map[int]int
 
 var linesJustCleared = 0
+// 0 = None, 1 = Mini, 2 = Full
+var lastTSpin = 0
 var score = 0
 var highScore = 0
 

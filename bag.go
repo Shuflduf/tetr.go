@@ -7,6 +7,7 @@ import (
 
 const BAG_SIZE = 7
 
+var nextPieces []Piece
 var bag []Piece
 var startingPos = [2]int{-2, -10}
 
