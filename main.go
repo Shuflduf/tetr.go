@@ -215,7 +215,7 @@ func GameInit() {
 
 func main() {
 	ebiten.SetWindowSize(1152, 864)
-	ebiten.SetWindowTitle("Hello, World!")
+	ebiten.SetWindowTitle("tetr.go")
 
 	img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(textureData))
 	if err != nil {
